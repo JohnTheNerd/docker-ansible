@@ -1,0 +1,62 @@
+---
+- name: Install required packages
+  apt:
+    pkg:
+    - aptitude
+    - apt-transport-https
+    - ca-certificates
+    - software-properties-common
+    - python3-pip
+    - virtualenv
+    - python3-dev
+    - python3-setuptools
+    - curl
+
+- name: Add Docker GPG apt key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: Add Docker repository
+  apt_repository:
+    repo: deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+    state: present
+
+- name: Update apt cache and packages
+  apt:
+    update_cache: 'yes'
+    autoclean: 'yes'
+    autoremove: 'yes'
+    upgrade: 'dist'
+
+- name: Install Docker and all dependencies
+  apt:
+    pkg:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - libffi6
+    - libffi-dev
+
+- name: Allow the default user to run Docker commands without sudo
+  user:
+    name: '{{ ansible_user_id }}'
+    groups: 'docker'
+    append: yes
+
+- name: Enable and start the Docker daemon
+  systemd:
+    name: docker
+    enabled: yes
+    masked: no
+    state: started
+
+- name: Install Docker module for Python
+  pip:
+    name: docker
+    executable: pip3
+
+- name: Install docker-compose
+  pip:
+    name: docker-compose
+    executable: pip3
