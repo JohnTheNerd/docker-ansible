@@ -40,7 +40,7 @@
 
 - name: Allow the default user to run Docker commands without sudo
   user:
-    name: '{{ ansible_user_id }}'
+    name: '{{ docker_sudo_username }}'
     groups: 'docker'
     append: yes
 
